@@ -9,14 +9,13 @@ graph MonoSynth  [[main]]
     input stream float drive [[ name: "Drive", min: 1.0, max: 50.0, init: 1.0 ]];
     input event float attack [[ name: "Attack", min: 0.0, max: 100.0, init: 1.0 ]];
     input event float release [[ name: "Release", min: 0.0, max: 100.0, init: 1.0 ]];
-    input stream float release2 [[ name: "Release", min: 0.0, max: 100.0, init: 1.0 ]];
 
-    input event midi::Message midiIn;
+    input event soul::midi::Message midiIn;
     output stream float audioOut;
 
     let
     {
-        midiParser = midi::MPEParser;
+        midiParser = soul::midi::MPEParser;
         voice = SineOsc;
         waveshaper = Waveshaper;
         envelope = Envelope;
@@ -41,18 +40,18 @@ graph MonoSynth  [[main]]
 //==============================================================================
 processor SineOsc
 {
-    input event (soul::NoteEvents::NoteOn,
-                 soul::NoteEvents::NoteOff) eventIn;
+    input event (soul::note_events::NoteOn,
+                 soul::note_events::NoteOff) eventIn;
 
     output stream float audioOut;
 
-    event eventIn (soul::NoteEvents::NoteOn e)
+    event eventIn (soul::note_events::NoteOn e)
     {
         currentNote = e.note;
         phaseIncrement = float (twoPi * processor.period * soul::noteNumberToFrequency (e.note));
     }
 
-    event eventIn (soul::NoteEvents::NoteOff e)
+    event eventIn (soul::note_events::NoteOff e)
     {
         if (e.note == currentNote)
             currentNote = 0;
@@ -100,8 +99,8 @@ processor Envelope
     input event float attack [[ name: "Attack", min: 0.0, max: 100.0, init: 1.0 ]];
     input event float release [[ name: "Release", min: 0.0, max: 100.0, init: 1.0 ]];
 
-    input event (soul::NoteEvents::NoteOn,
-                 soul::NoteEvents::NoteOff) eventIn;
+    input event (soul::note_events::NoteOn,
+                 soul::note_events::NoteOff) eventIn;
 
     output stream float audioOut;
 
@@ -119,12 +118,12 @@ processor Envelope
         releaseRamp = pow (0.0001f, 1.0f / float (releaseSamples));
     }
 
-    event eventIn (soul::NoteEvents::NoteOn noteOn)
+    event eventIn (soul::note_events::NoteOn noteOn)
     {
         currentNote = noteOn.note;
     }
 
-    event eventIn (soul::NoteEvents::NoteOff noteOff)
+    event eventIn (soul::note_events::NoteOff noteOff)
     {
         if (currentNote == noteOff.note)
             currentNote = 0;

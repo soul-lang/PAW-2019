@@ -6,12 +6,12 @@
 */
 graph MonoSynth  [[main]]
 {
-    input event midi::Message midiIn;
+    input event soul::midi::Message midiIn;
     output stream float audioOut;
 
     let
     {
-        midiParser = midi::MPEParser;
+        midiParser = soul::midi::MPEParser;
         voice = SineOsc;
     }
 
@@ -26,18 +26,18 @@ graph MonoSynth  [[main]]
 //==============================================================================
 processor SineOsc
 {
-    input event (soul::NoteEvents::NoteOn,
-                 soul::NoteEvents::NoteOff) eventIn;
+    input event (soul::note_events::NoteOn,
+                 soul::note_events::NoteOff) eventIn;
 
     output stream float audioOut;
 
-    event eventIn (soul::NoteEvents::NoteOn e)
+    event eventIn (soul::note_events::NoteOn e)
     {
         currentNote = e.note;
         phaseIncrement = float (twoPi * processor.period * soul::noteNumberToFrequency (e.note));
     }
 
-    event eventIn (soul::NoteEvents::NoteOff e)
+    event eventIn (soul::note_events::NoteOff e)
     {
         if (e.note == currentNote)
             currentNote = 0;
